@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexora - Accelerating Humanity</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #000;
+            --text: #fff;
+            --muted: rgba(255, 255, 255, 0.5);
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+        }
+
+        #webgl-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* --- Navbar & Footer --- */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 30px 50px;
+            pointer-events: auto;
+            z-index: 100;
+        }
+
+        .nav-logo {
+            font-size: 24px;
+            font-weight: 700;
+            text-decoration: none;
+            color: #fff;
+            letter-spacing: -1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: #fff;
+        }
+
+        .nav-right-btn {
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            background: none;
+            color: #fff;
+            border-radius: 20px;
+            padding: 10px 20px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-right-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 40px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            pointer-events: auto;
+            z-index: 100;
+            transition: opacity 0.4s;
+        }
+
+        /* --- Main Hero Layout --- */
+        .search-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 50;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hero-title {
+            font-size: 16vw;
+            font-weight: 700;
+            margin: 0;
+            line-height: 0.8;
+            background: linear-gradient(180deg, #fff 0%, rgba(255, 255, 255, 0.8) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            opacity: 0.9;
+            user-select: none;
+            filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.8));
+            transition: all 0.5s ease;
+            transform: translateY(20px);
+        }
+
+        /* --- Chat Input Box --- */
+        .chat-input-wrapper {
+            width: 100%;
+            max-width: 700px;
+            background: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 24px;
+            padding: 24px 30px;
+            display: flex;
+            align-items: center;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(-20px);
+            /* Overlap title slightly */
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+            pointer-events: auto;
+        }
+
+        .chat-input-wrapper:focus-within {
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(15, 15, 15, 0.95);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.08);
+        }
+
+        .chat-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 18px;
+            outline: none;
+        }
+
+        .chat-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .submit-btn {
+            background: rgba(255, 255, 255, 0.4);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.2s, background 0.2s;
+            margin-left: 15px;
+            color: #000;
+        }
+
+        .chat-input-wrapper:focus-within .submit-btn {
+            background: #fff;
+        }
+
+        .submit-btn:hover {
+            opacity: 0.8;
+        }
+
+        .role-selector-compact {
+            font-size: 11px;
+            text-transform: uppercase;
+            transition: opacity 0.2s;
+            pointer-events: auto;
+        }
+
+        .role-selector-compact select {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            outline: none;
+            cursor: pointer;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .role-selector-compact select:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .role-selector-compact option {
+            background: #111;
+            color: #fff;
+        }
+
+        /* --- Active Chat Mode --- */
+        /* When search becomes active chat */
+        body.chat-active .search-container {
+            justify-content: flex-end;
+            /* Push box down */
+            padding-bottom: 200px;
+            /* Dock higher up */
+        }
+
+        body.chat-active .hero-title {
+            opacity: 0;
+            transform: translateY(-50px);
+            pointer-events: none;
+        }
+
+        body.chat-active footer {
+            display: none;
+        }
+
+        body.chat-active .chat-input-wrapper {
+            transform: translateY(0);
+            max-width: 800px;
+            /* Expand slightly */
+            padding: 18px 25px;
+            /* Shrink vertically */
+            background: rgba(10, 10, 10, 0.8);
+            border-radius: 20px;
+        }
+
+        /* --- Chat History Space --- */
+        .chat-history {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 800px;
+            height: calc(100vh - 300px);
+            overflow-y: auto;
+            padding: 20px;
+            box-sizing: border-box;
+            z-index: 40;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease 0.2s;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+        }
+
+        .chat-history::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .chat-history::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        body.chat-active .chat-history {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .msg-block {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .msg-bubble {
+            padding: 14px 20px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            max-width: 85%;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .user .msg-bubble {
+            background: rgba(30, 30, 30, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-left: auto;
+            border-bottom-right-radius: 2px;
+        }
+
+        .system .msg-bubble {
+            color: #fff;
+            padding-left: 0;
+            background: transparent;
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.9), 0 1px 3px rgba(0, 0, 0, 0.8);
+            font-weight: 500;
+        }
+
+        .new-chat-btn {
+            position: fixed;
+            top: 30px;
+            right: 200px;
+            background: none;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            z-index: 110;
+            display: none;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .new-chat-btn:hover {
+            opacity: 1;
+        }
+
+        body.chat-active .new-chat-btn {
+            display: block;
+        }
+
+        /* Nebula Core 3D Loading Animation */
+        .nebula-container {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            height: 32px;
+            padding-left: 10px;
+        }
+
+        .nebula-core {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0 0 10px #fff, 0 0 20px #8a2be2, 0 0 30px #4a90e2;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: core-pulse 2s ease-in-out infinite alternate;
+        }
+
+        .nebula-core::before,
+        .nebula-core::after,
+        .nebula-ring {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            border-radius: 50%;
+            border: 1.5px solid transparent;
+        }
+
+        .nebula-core::before {
+            border-top-color: rgba(74, 144, 226, 0.9);
+            border-right-color: rgba(74, 144, 226, 0.2);
+            animation: orbit-x 1.5s linear infinite;
+            filter: drop-shadow(0 0 5px #4a90e2);
+        }
+
+        .nebula-core::after {
+            border-bottom-color: rgba(138, 43, 226, 0.9);
+            border-left-color: rgba(138, 43, 226, 0.2);
+            animation: orbit-y 2s linear infinite;
+            filter: drop-shadow(0 0 5px #8a2be2);
+        }
+
+        .nebula-ring {
+            position: absolute;
+            top: -14px;
+            left: -14px;
+            right: -14px;
+            bottom: -14px;
+            border-radius: 50%;
+            border: 1px solid transparent;
+            border-top-color: rgba(255, 255, 255, 0.8);
+            border-bottom-color: rgba(255, 255, 255, 0.1);
+            animation: orbit-z 2.5s linear infinite;
+            filter: drop-shadow(0 0 4px #fff);
+        }
+
+        @keyframes core-pulse {
+            0% {
+                transform: scale(0.9);
+                box-shadow: 0 0 5px #fff, 0 0 15px #8a2be2;
+            }
+
+            100% {
+                transform: scale(1.1);
+                box-shadow: 0 0 15px #fff, 0 0 30px #8a2be2, 0 0 45px #4a90e2;
+            }
+        }
+
+        @keyframes orbit-x {
+            0% {
+                transform: rotateX(70deg) rotateZ(0deg);
+            }
+
+            100% {
+                transform: rotateX(70deg) rotateZ(360deg);
+            }
+        }
+
+        @keyframes orbit-y {
+            0% {
+                transform: rotateY(70deg) rotateZ(0deg);
+            }
+
+            100% {
+                transform: rotateY(70deg) rotateZ(360deg);
+            }
+        }
+
+        @keyframes orbit-z {
+            0% {
+                transform: rotateX(45deg) rotateY(45deg) rotateZ(0deg);
+            }
+
+            100% {
+                transform: rotateX(45deg) rotateY(45deg) rotateZ(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="webgl-container"></div>
+
+    <nav>
+        <a href="#" class="nav-logo">NEXORA</a>
+        <div class="nav-right">
+            <div class="role-selector-compact">
+                <select id="role">
+                    <option value="Public">Public</option>
+                    <option value="Scientist">Scientist</option>
+                </select>
+            </div>
+        </div>
+    </nav>
+
+    <button class="new-chat-btn" onclick="resetChat()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+    </button>
+
+    <div class="chat-history" id="chat-history"></div>
+
+    <div class="search-container">
+        <h1 class="hero-title">Nexora</h1>
+
+        <div style="position: relative; width: 100%; max-width: 700px; display: flex; justify-content: center;">
+            <div class="chat-input-wrapper">
+                <input type="text" class="chat-input" id="query-input" placeholder="What do you want to know?"
+                    onkeydown="handleEnter(event)">
+                <button class="submit-btn" onclick="sendQuery()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                        <path d="M12 19V5M5 12l7-7 7 7" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Shader for Flowing Interactive Light -->
+    <script id="fragmentShader" type="x-shader/x-fragment">
+        uniform float u_time;
+        uniform vec2 u_mouse;
+        uniform vec2 u_resolution;
+
+        float random(vec2 st) { return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123); }
+        float noise(vec2 st) {
+            vec2 i = floor(st); vec2 f = fract(st);
+            float a = random(i); float b = random(i + vec2(1.0, 0.0));
+            float c = random(i + vec2(0.0, 1.0)); float d = random(i + vec2(1.0, 1.0));
+            vec2 u = f * f * (3.0 - 2.0 * f);
+            return mix(a, b, u.x) + (c - a)* u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+        }
+
+        float fbm(vec2 st) {
+            float value = 0.0; float amplitude = 0.5;
+            for (int i = 0; i < 5; i++) {
+                value += amplitude * noise(st);
+                st *= 2.0; amplitude *= 0.5;
+            }
+            return value;
+        }
+
+        void main() {
+            vec2 uv = gl_FragCoord.xy / u_resolution.xy;
+            vec2 p = uv * 2.0 - 1.0;
+            p.x *= u_resolution.x / u_resolution.y;
+
+            vec2 mouse = u_mouse * 2.0 - 1.0;
+            mouse.x *= u_resolution.x / u_resolution.y;
+
+            float mouseDist = length(p - mouse);
+            
+            vec2 flow = p;
+            flow += (p - mouse) * 0.4 * exp(-mouseDist * 2.5); 
+
+            vec2 q = vec2(0.0);
+            q.x = fbm(flow + 0.1 * u_time);
+            q.y = fbm(flow + vec2(1.0));
+
+            vec2 r = vec2(0.0);
+            // More organic and slower horizontal pull
+            r.x = fbm(flow + 1.0 * q + vec2(1.7, 9.2) + 0.1 * u_time); 
+            r.y = fbm(flow + 1.0 * q + vec2(8.3, 2.8) + 0.08 * u_time);
+
+            float f = fbm(flow + r * 2.0); 
+
+            // Base Light Setup (Emanating from middle-right like xAI image)
+            vec2 lightPos = vec2(1.0, 0.0); 
+            // Stretch the light horizontally
+            float lightDist = length(vec2(p.x - lightPos.x, (p.y - lightPos.y) * 1.5));
+            
+            float core = exp(-lightDist * 1.5);
+            float aura = smoothstep(0.0, 1.0, f) * core * 0.7;
+
+            vec3 colorBase = vec3(0.00, 0.00, 0.01); // Deeper void
+            vec3 colorEdge = vec3(0.02, 0.15, 0.45); // Deeper Blue, less bright
+            vec3 colorCore = vec3(0.5, 0.65, 0.85);  // Less Blinding white
+
+            vec3 finalColor = mix(colorBase, colorEdge, clamp((f * f) * 3.0, 0.0, 1.0));
+            finalColor = mix(finalColor, colorCore, clamp(pow(aura, 0.9) * 2.5, 0.0, 1.0));
+
+            float rightBloom = smoothstep(-0.2, 2.0, p.x + 1.0) * f;
+            finalColor += vec3(0.4, 0.5, 0.7) * pow(rightBloom, 2.0) * 0.5;
+
+            float hoverGlow = exp(-mouseDist * 3.0) * 0.2;
+            // Less extreme hover glow, more subtle liquid reaction
+            finalColor += colorEdge * hoverGlow * f * 0.4;
+
+            gl_FragColor = vec4(finalColor, 1.0);
+        }
+    </script>
+
+    <script>
+        let scene, camera, renderer, material;
+        let mouse = new THREE.Vector2(0.5, 0.5);
+        let targetMouse = new THREE.Vector2(0.5, 0.5);
+
+        function initShader() {
+            scene = new THREE.Scene();
+            camera = new THREE.Camera(); camera.position.z = 1;
+            const geometry = new THREE.PlaneGeometry(2, 2);
+            material = new THREE.ShaderMaterial({
+                uniforms: {
+                    u_time: { value: 0.0 }, u_mouse: { value: new THREE.Vector2() }, u_resolution: { value: new THREE.Vector2() }
+                },
+                fragmentShader: document.getElementById('fragmentShader').textContent,
+                transparent: true, blending: THREE.AdditiveBlending
+            });
+            const mesh = new THREE.Mesh(geometry, material); scene.add(mesh);
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.getElementById('webgl-container').appendChild(renderer.domElement);
+
+            onWindowResize();
+            window.addEventListener('resize', onWindowResize);
+            document.addEventListener('mousemove', (e) => {
+                targetMouse.x = e.clientX / window.innerWidth;
+                targetMouse.y = 1.0 - (e.clientY / window.innerHeight);
+            });
+        }
+
+        function onWindowResize() {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            material.uniforms.u_resolution.value.set(window.innerWidth, window.innerHeight);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            material.uniforms.u_time.value += 0.01;
+            mouse.lerp(targetMouse, 0.05);
+            material.uniforms.u_mouse.value.copy(mouse);
+            renderer.render(scene, camera);
+        }
+
+        initShader(); animate();
+
+        // --- Chat UI Logic ---
+        const historyBox = document.getElementById('chat-history');
+        const inputContainer = document.querySelector('.search-container');
+
+        function handleEnter(e) { if (e.key === 'Enter') sendQuery(); }
+
+        function resetChat() {
+            document.body.classList.remove('chat-active');
+            historyBox.innerHTML = '';
+        }
+
+        function appendMessage(role, text) {
+            const block = document.createElement('div');
+            block.className = `msg-block ${role}`;
+            const bubble = document.createElement('div');
+            bubble.className = 'msg-bubble';
+            if (text) {
+                bubble.textContent = text;
+            } else {
+                bubble.innerHTML = '<div class="nebula-container"><div class="nebula-core"><div class="nebula-ring"></div></div></div>';
+            }
+            block.appendChild(bubble);
+            historyBox.appendChild(block);
+            historyBox.scrollTop = historyBox.scrollHeight;
+            return bubble;
+        }
+
+        async function sendQuery() {
+            const input = document.getElementById('query-input');
+            const query = input.value.trim();
+            if (!query) return;
+
+            // Trigger Transition
+            document.body.classList.add('chat-active');
+            input.value = '';
+
+            // We must wait a slight moment for the history box to appear/become active before appending
+            setTimeout(async () => {
+                appendMessage('user', query);
+                const sysBubble = appendMessage('system', null);
+
+                try {
+                    const response = await fetch('/query', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ query: query, role: document.getElementById('role').value })
+                    });
+
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder();
+                    let isFirstChunk = true;
+
+                    while (true) {
+                        const { done, value } = await reader.read();
+                        if (done) break;
+
+                        if (isFirstChunk) {
+                            sysBubble.innerHTML = ''; // Clear thinking wave only when first text chunk arrives
+                            isFirstChunk = false;
+                        }
+
+                        sysBubble.textContent += decoder.decode(value, { stream: true });
+                        historyBox.scrollTop = historyBox.scrollHeight;
+                    }
+
+                    if (isFirstChunk) sysBubble.innerHTML = ''; // Fallback if empty response
+                } catch (e) { sysBubble.textContent = "Connection error."; }
+            }, 300); // Wait for transition
+        }
+    </script>
+</body>
+
+</html>
