@@ -48,7 +48,7 @@ class RAGSystem:
 
         return response
 
-    def process_query_stream(self, user_id, user_role, query):
+    async def process_query_stream(self, user_id, user_role, query):
         """
         Streaming pipeline: RBAC -> Retrieve -> Validate -> Generate Stream
         """
@@ -79,7 +79,7 @@ class RAGSystem:
 
         # 5. Generate Response Stream
         from backend.llm_engine import generate_response_stream
-        for chunk in generate_response_stream(query, allowed_chunks):
+        async for chunk in generate_response_stream(query, allowed_chunks):
             yield chunk
 
 # Singleton Instance

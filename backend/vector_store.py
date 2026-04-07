@@ -29,19 +29,56 @@ def get_embeddings():
 
         if os.path.exists(local_model_path):
             print(f"Loading embedding model from local cache: {local_model_path}")
-            _CACHED_EMBEDDINGS = HuggingFaceEmbeddings(model_name=local_model_path)
+            _CACHED_EMBEDDINGS = HuggingFaceEmbeddings(
+                model_name=local_model_path,
+                model_kwargs={'device': 'cpu'}
+            )
         else:
             print(f"Local model not found at {local_model_path}, attempting download/load from Hub...")
-            _CACHED_EMBEDDINGS = HuggingFaceEmbeddings(model_name=MODEL_NAME)
+            _CACHED_EMBEDDINGS = HuggingFaceEmbeddings(
+                model_name=MODEL_NAME,
+                model_kwargs={'device': 'cpu'}
+            )
             
     return _CACHED_EMBEDDINGS
 
 def create_vector_store(documents):
     """
     Creates a FAISS vector store from the provided documents and saves it locally.
+    Uses Int8 Scalar Quantization for latency and memory optimization.
     """
+    import numpy as np
+    from langchain_community.docstore.in_memory import InMemoryDocstore
+    
     embeddings = get_embeddings()
-    vector_store = FAISS.from_documents(documents, embeddings)
+    texts = [doc.page_content for doc in documents]
+    metadatas = [doc.metadata for doc in documents]
+    
+    print("Generating embeddings for Int8 FAISS index...")
+    text_embeddings = embeddings.embed_documents(texts)
+    
+    d = len(text_embeddings[0])
+    # Create an HNSW index with Int8 Scalar Quantization for maximum speed and memory efficiency
+    # HNSW32: Graph-based index with 32 connections per node (lightning-fast O(log N) search)
+    # SQ8: 8-bit scalar quantization (small memory footprint)
+    index = faiss.index_factory(d, "HNSW32,SQ8")
+    
+    print("Training HNSW + Int8 Quantizer Index...")
+    docs_np = np.array(text_embeddings, dtype=np.float32)
+    index.train(docs_np)
+    
+    # Create the lang-chain vector_store
+    vector_store = FAISS(
+        embedding_function=embeddings,
+        index=index,
+        docstore=InMemoryDocstore(),
+        index_to_docstore_id={}
+    )
+    
+    # Add embeddings directly
+    text_embedding_pairs = list(zip(texts, text_embeddings))
+    vector_store.add_embeddings(text_embeddings=text_embedding_pairs, metadatas=metadatas)
+    
     vector_store.save_local(VECTOR_STORE_PATH)
     return vector_store
 

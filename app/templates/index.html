@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nexora</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -234,8 +235,9 @@
         body.chat-active .search-container {
             justify-content: flex-end;
             /* Push box down */
-            padding-bottom: 200px;
+            padding-bottom: 60px;
             /* Dock higher up */
+            pointer-events: none;
         }
 
         body.chat-active .hero-title {
@@ -256,6 +258,7 @@
             /* Shrink vertically */
             background: rgba(10, 10, 10, 0.8);
             border-radius: 20px;
+            pointer-events: auto;
         }
 
         /* --- Chat History Space --- */
@@ -266,7 +269,7 @@
             transform: translateX(-50%);
             width: 100%;
             max-width: 800px;
-            height: calc(100vh - 300px);
+            height: calc(100vh - 180px);
             overflow-y: auto;
             padding: 20px;
             box-sizing: border-box;
@@ -333,6 +336,28 @@
             background: transparent;
             text-shadow: 0 4px 12px rgba(0, 0, 0, 0.9), 0 1px 3px rgba(0, 0, 0, 0.8);
             font-weight: 500;
+        }
+
+        .system .msg-bubble p {
+            margin: 0 0 15px 0;
+        }
+        
+        .system .msg-bubble p:last-child {
+            margin-bottom: 0;
+        }
+
+        .system .msg-bubble strong {
+            font-weight: 700;
+            color: #e2e8f0;
+        }
+
+        .system .msg-bubble ul, .system .msg-bubble ol {
+            margin: 10px 0 15px 0;
+            padding-left: 20px;
+        }
+
+        .system .msg-bubble li {
+            margin-bottom: 5px;
         }
 
         .new-chat-btn {
@@ -451,18 +476,215 @@
         }
 
         @keyframes orbit-z {
-            0% {
-                transform: rotateX(45deg) rotateY(45deg) rotateZ(0deg);
-            }
-
-            100% {
-                transform: rotateX(45deg) rotateY(45deg) rotateZ(360deg);
-            }
+            0% { transform: rotateX(45deg) rotateY(45deg) rotateZ(0deg); }
+            100% { transform: rotateX(45deg) rotateY(45deg) rotateZ(360deg); }
         }
+        
+        /* --- Sidebar --- */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 260px;
+            height: 100vh;
+            background: rgba(10, 10, 10, 0.95);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            z-index: 200;
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            padding: 20px 15px;
+            box-sizing: border-box;
+        }
+
+        .sidebar.closed {
+            transform: translateX(-100%);
+        }
+
+        .sidebar-toggle {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            z-index: 210;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .sidebar-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .new-chat-sidebar-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 60px; /* Space for toggle */
+            transition: background 0.2s;
+        }
+
+        .new-chat-sidebar-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .sessions-list {
+            margin-top: 20px;
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,0.2) transparent;
+        }
+
+        .session-item {
+            padding: 12px 10px;
+            color: #ccc;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .session-item:hover, .session-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        /* --- Custom Nav position --- */
+        nav {
+            padding-left: 90px; /* shift right so toggle fits */
+        }
+        
+        .sidebar-open-shift nav {
+            padding-left: 300px;
+        }
+        
+        .sidebar-open-shift .search-container,
+        .sidebar-open-shift .chat-history {
+            transform: translateX(130px);
+            width: calc(100% - 260px);
+        }
+
+        /* --- Login Modal --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: rgba(15, 15, 15, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 30px;
+            border-radius: 16px;
+            width: 320px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            text-align: center;
+        }
+
+        .modal-content h3 { margin: 0; font-size: 18px; }
+        .modal-content input {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.3);
+            color: #fff;
+            padding: 12px;
+            border-radius: 8px;
+            outline: none;
+            font-size: 14px;
+        }
+        .modal-content input:focus { border-color: #4a90e2; }
+        
+        .modal-btns {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .modal-btns button {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .btn-cancel { background: rgba(255,255,255,0.1); color: #fff; }
+        .btn-submit { background: #fff; color: #000; }
+        
     </style>
 </head>
 
 <body>
+    <!-- Sidebar -->
+    <aside class="sidebar closed" id="sidebar">
+        <button class="new-chat-sidebar-btn" onclick="createNewSession()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            New Chat
+        </button>
+        <div class="sessions-list" id="sessions-list"></div>
+    </aside>
+
+    <button class="sidebar-toggle" onclick="toggleSidebar()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+    </button>
+
+    <!-- Login Modal -->
+    <div class="modal-overlay" id="login-modal">
+        <div class="modal-content">
+            <h3>Scientist Access</h3>
+            <p style="font-size:13px; color:#aaa; margin-bottom:5px;">Enter credentials to unlock classified documents.</p>
+            <input type="text" id="username" placeholder="Username">
+            <input type="password" id="password" placeholder="Password">
+            <div class="modal-btns">
+                <button class="btn-cancel" onclick="cancelLogin()">Cancel</button>
+                <button class="btn-submit" onclick="submitLogin()">Login</button>
+            </div>
+        </div>
+    </div>
+
     <div id="webgl-container"></div>
 
     <nav>
@@ -477,7 +699,7 @@
         </div>
     </nav>
 
-    <button class="new-chat-btn" onclick="resetChat()">
+    <button class="new-chat-btn" onclick="createNewSession()">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -623,13 +845,119 @@
         // --- Chat UI Logic ---
         const historyBox = document.getElementById('chat-history');
         const inputContainer = document.querySelector('.search-container');
+        let currentSessionId = null;
 
         function handleEnter(e) { if (e.key === 'Enter') sendQuery(); }
 
-        function resetChat() {
+        // --- Sidebar & Sessions ---
+        async function loadSessions() {
+            try {
+                const res = await fetch('/sessions');
+                const sessions = await res.json();
+                const list = document.getElementById('sessions-list');
+                list.innerHTML = '';
+                sessions.forEach(s => {
+                    const div = document.createElement('div');
+                    div.className = 'session-item' + (s.id === currentSessionId ? ' active' : '');
+                    div.textContent = s.title || 'New Chat';
+                    div.onclick = () => selectSession(s.id);
+                    list.appendChild(div);
+                });
+            } catch(e) {}
+        }
+        
+        async function createNewSession() {
             document.body.classList.remove('chat-active');
             historyBox.innerHTML = '';
+            currentSessionId = null;
+            document.getElementById('query-input').value = '';
+            loadSessions();
+            if (window.innerWidth <= 768 && !document.getElementById('sidebar').classList.contains('closed')) toggleSidebar();
         }
+        
+        async function selectSession(id) {
+            try {
+                const res = await fetch(`/sessions/${id}`);
+                const session = await res.json();
+                currentSessionId = session.id;
+                
+                document.body.classList.add('chat-active');
+                historyBox.innerHTML = '';
+                
+                session.messages.forEach(msg => {
+                    const block = document.createElement('div');
+                    block.className = `msg-block ${msg.role}`;
+                    const bubble = document.createElement('div');
+                    bubble.className = 'msg-bubble';
+                    if (msg.role === 'user') {
+                        bubble.textContent = msg.content;
+                    } else {
+                        bubble.innerHTML = marked.parse(msg.content);
+                    }
+                    block.appendChild(bubble);
+                    historyBox.appendChild(block);
+                });
+                historyBox.scrollTop = historyBox.scrollHeight;
+                loadSessions(); // update active state in sidebar
+                if (window.innerWidth <= 768) toggleSidebar();
+            } catch(e) {}
+        }
+        
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('closed');
+            if (sidebar.classList.contains('closed')) {
+                document.body.classList.remove('sidebar-open-shift');
+            } else {
+                document.body.classList.add('sidebar-open-shift');
+            }
+        }
+        
+        // --- Authentication ---
+        const roleSelect = document.getElementById('role');
+        let lastValidRole = "Public";
+        let isScientistAuthenticated = false;
+        
+        roleSelect.addEventListener('change', (e) => {
+            if (e.target.value === "Scientist") {
+                if (!isScientistAuthenticated) {
+                    document.getElementById('login-modal').classList.add('active');
+                } else {
+                    lastValidRole = "Scientist";
+                }
+            } else {
+                lastValidRole = e.target.value;
+            }
+        });
+        
+        function cancelLogin() {
+            document.getElementById('login-modal').classList.remove('active');
+            roleSelect.value = lastValidRole;
+        }
+        
+        async function submitLogin() {
+            const u = document.getElementById('username').value;
+            const p = document.getElementById('password').value;
+            try {
+                const res = await fetch('/login', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({username: u, password: p})
+                });
+                if (res.ok) {
+                    isScientistAuthenticated = true;
+                    lastValidRole = "Scientist";
+                    document.getElementById('login-modal').classList.remove('active');
+                    document.getElementById('username').value = '';
+                    document.getElementById('password').value = '';
+                } else {
+                    alert('Invalid credentials!');
+                }
+            } catch(e) { alert('Login error'); }
+        }
+
+        // Initialize on load
+        loadSessions();
 
         function appendMessage(role, text) {
             const block = document.createElement('div');
@@ -652,6 +980,15 @@
             const query = input.value.trim();
             if (!query) return;
 
+            // Ensure session exists
+            if (!currentSessionId) {
+                try {
+                    const s_res = await fetch('/sessions/new', { method: 'POST' });
+                    const s_data = await s_res.json();
+                    currentSessionId = s_data.session_id;
+                } catch(e) {}
+            }
+
             // Trigger Transition
             document.body.classList.add('chat-active');
             input.value = '';
@@ -665,12 +1002,17 @@
                     const response = await fetch('/query', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ query: query, role: document.getElementById('role').value })
+                        body: JSON.stringify({ 
+                            query: query, 
+                            role: document.getElementById('role').value,
+                            session_id: currentSessionId 
+                        })
                     });
 
                     const reader = response.body.getReader();
                     const decoder = new TextDecoder();
                     let isFirstChunk = true;
+                    let fullText = "";
 
                     while (true) {
                         const { done, value } = await reader.read();
@@ -681,11 +1023,13 @@
                             isFirstChunk = false;
                         }
 
-                        sysBubble.textContent += decoder.decode(value, { stream: true });
+                        fullText += decoder.decode(value, { stream: true });
+                        sysBubble.innerHTML = marked.parse(fullText);
                         historyBox.scrollTop = historyBox.scrollHeight;
                     }
 
                     if (isFirstChunk) sysBubble.innerHTML = ''; // Fallback if empty response
+                    loadSessions(); // Update titles in sidebar immediately
                 } catch (e) { sysBubble.textContent = "Connection error."; }
             }, 300); // Wait for transition
         }
