@@ -135,6 +135,7 @@
             line-height: 0.8;
             background: linear-gradient(180deg, #fff 0%, rgba(255, 255, 255, 0.8) 100%);
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
             opacity: 0.9;
             user-select: none;
@@ -203,14 +204,16 @@
             opacity: 0.8;
         }
 
-        .role-selector-compact {
+        .role-selector-compact,
+        .model-selector-compact {
             font-size: 11px;
             text-transform: uppercase;
             transition: opacity 0.2s;
             pointer-events: auto;
         }
 
-        .role-selector-compact select {
+        .role-selector-compact select,
+        .model-selector-compact select {
             background: rgba(255, 255, 255, 0.1);
             color: #fff;
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -221,11 +224,13 @@
             font-weight: 600;
         }
 
-        .role-selector-compact select:hover {
+        .role-selector-compact select:hover,
+        .model-selector-compact select:hover {
             background: rgba(255, 255, 255, 0.15);
         }
 
-        .role-selector-compact option {
+        .role-selector-compact option,
+        .model-selector-compact option {
             background: #111;
             color: #fff;
         }
@@ -295,6 +300,26 @@
             pointer-events: auto;
         }
 
+        .source-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: #4da6ff;
+            background: rgba(77, 166, 255, 0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            font-family: 'Space Mono', monospace;
+            border-left: 2px solid #4da6ff;
+        }
+
+        .gap-warning {
+            color: #ffcc00 !important;
+            background: rgba(255, 204, 0, 0.1) !important;
+            border-left: 2px solid #ffcc00 !important;
+        }
+
         .msg-block {
             display: flex;
             flex-direction: column;
@@ -341,7 +366,7 @@
         .system .msg-bubble p {
             margin: 0 0 15px 0;
         }
-        
+
         .system .msg-bubble p:last-child {
             margin-bottom: 0;
         }
@@ -351,7 +376,8 @@
             color: #e2e8f0;
         }
 
-        .system .msg-bubble ul, .system .msg-bubble ol {
+        .system .msg-bubble ul,
+        .system .msg-bubble ol {
             margin: 10px 0 15px 0;
             padding-left: 20px;
         }
@@ -361,25 +387,25 @@
         }
 
         .new-chat-btn {
-            position: fixed;
-            top: 30px;
-            right: 200px;
             background: none;
             border: none;
             color: #fff;
             cursor: pointer;
-            z-index: 110;
             display: none;
             opacity: 0.6;
-            transition: opacity 0.2s;
+            transition: opacity 0.2s, transform 0.2s;
+            padding: 5px;
+            align-items: center;
+            justify-content: center;
         }
 
         .new-chat-btn:hover {
             opacity: 1;
+            transform: scale(1.1);
         }
 
         body.chat-active .new-chat-btn {
-            display: block;
+            display: flex;
         }
 
         /* Nebula Core 3D Loading Animation */
@@ -476,10 +502,15 @@
         }
 
         @keyframes orbit-z {
-            0% { transform: rotateX(45deg) rotateY(45deg) rotateZ(0deg); }
-            100% { transform: rotateX(45deg) rotateY(45deg) rotateZ(360deg); }
+            0% {
+                transform: rotateX(45deg) rotateY(45deg) rotateZ(0deg);
+            }
+
+            100% {
+                transform: rotateX(45deg) rotateY(45deg) rotateZ(360deg);
+            }
         }
-        
+
         /* --- Sidebar --- */
         .sidebar {
             position: fixed;
@@ -487,14 +518,14 @@
             left: 0;
             width: 260px;
             height: 100vh;
-            background: rgba(10, 10, 10, 0.95);
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(13, 13, 13, 0.98);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(20px);
             z-index: 200;
             transition: transform 0.3s ease;
             display: flex;
             flex-direction: column;
-            padding: 20px 15px;
+            padding: 24px 16px;
             box-sizing: border-box;
         }
 
@@ -502,17 +533,29 @@
             transform: translateX(-100%);
         }
 
+        .sidebar-header {
+            font-size: 11px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 30px 0 10px 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
         .sidebar-toggle {
             position: fixed;
             top: 30px;
             left: 30px;
             z-index: 210;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 8px;
             color: #fff;
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -521,65 +564,93 @@
         }
 
         .sidebar-toggle:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .new-chat-sidebar-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #fff;
+            background: #fff;
+            color: #000;
             padding: 12px;
-            border-radius: 8px;
+            border-radius: 10px;
             cursor: pointer;
             font-weight: 600;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 10px;
-            margin-top: 60px; /* Space for toggle */
-            transition: background 0.2s;
+            margin-top: 50px;
+            transition: transform 0.2s, background 0.2s;
+            border: none;
+            font-size: 14px;
         }
 
         .new-chat-sidebar-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateY(-1px);
         }
 
         .sessions-list {
-            margin-top: 20px;
+            margin-top: 10px;
             flex: 1;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 4px;
             scrollbar-width: thin;
-            scrollbar-color: rgba(255,255,255,0.2) transparent;
+            scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
         }
 
         .session-item {
-            padding: 12px 10px;
-            color: #ccc;
-            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            color: rgba(255, 255, 255, 0.6);
+            border-radius: 8px;
             cursor: pointer;
             font-size: 13px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
             transition: background 0.2s, color 0.2s;
         }
 
-        .session-item:hover, .session-item.active {
-            background: rgba(255, 255, 255, 0.1);
+        .session-item:hover,
+        .session-item.active {
+            background: rgba(255, 255, 255, 0.05);
             color: #fff;
+        }
+
+        .delete-session-btn {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.2s;
+        }
+
+        .session-item:hover .delete-session-btn {
+            opacity: 1;
+        }
+
+        .delete-session-btn:hover {
+            background: rgba(255, 77, 77, 0.1);
+            color: #ff4d4d;
         }
 
         /* --- Custom Nav position --- */
         nav {
-            padding-left: 90px; /* shift right so toggle fits */
+            padding-left: 90px;
+            /* shift right so toggle fits */
         }
-        
+
         .sidebar-open-shift nav {
             padding-left: 300px;
         }
-        
+
         .sidebar-open-shift .search-container,
         .sidebar-open-shift .chat-history {
             transform: translateX(130px);
@@ -593,7 +664,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(5px);
             z-index: 1000;
             display: none;
@@ -611,31 +682,38 @@
             padding: 30px;
             border-radius: 16px;
             width: 320px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
             display: flex;
             flex-direction: column;
             gap: 15px;
             text-align: center;
         }
 
-        .modal-content h3 { margin: 0; font-size: 18px; }
+        .modal-content h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+
         .modal-content input {
             background: transparent;
-            border: 1px solid rgba(255,255,255,0.3);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             color: #fff;
             padding: 12px;
             border-radius: 8px;
             outline: none;
             font-size: 14px;
         }
-        .modal-content input:focus { border-color: #4a90e2; }
-        
+
+        .modal-content input:focus {
+            border-color: #4a90e2;
+        }
+
         .modal-btns {
             display: flex;
             gap: 10px;
             margin-top: 10px;
         }
-        
+
         .modal-btns button {
             flex: 1;
             padding: 10px;
@@ -644,9 +722,16 @@
             cursor: pointer;
             font-weight: 600;
         }
-        .btn-cancel { background: rgba(255,255,255,0.1); color: #fff; }
-        .btn-submit { background: #fff; color: #000; }
-        
+
+        .btn-cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .btn-submit {
+            background: #fff;
+            color: #000;
+        }
     </style>
 </head>
 
@@ -654,12 +739,18 @@
     <!-- Sidebar -->
     <aside class="sidebar closed" id="sidebar">
         <button class="new-chat-sidebar-btn" onclick="createNewSession()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <line x1="12" y1="5" x2="12" y2="19"></line>
                 <line x1="5" y1="12" x2="19" y2="12"></line>
             </svg>
             New Chat
         </button>
+        <div class="sidebar-header">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 20v-6M12 8V2M4.93 4.93l4.24 4.24M14.83 14.83l4.24 4.24M2 12h6M16 12h6M4.93 19.07l4.24-4.24M14.83 9.17l4.24-4.24"></path>
+            </svg>
+            Recent Chats
+        </div>
         <div class="sessions-list" id="sessions-list"></div>
     </aside>
 
@@ -675,7 +766,8 @@
     <div class="modal-overlay" id="login-modal">
         <div class="modal-content">
             <h3>Scientist Access</h3>
-            <p style="font-size:13px; color:#aaa; margin-bottom:5px;">Enter credentials to unlock classified documents.</p>
+            <p style="font-size:13px; color:#aaa; margin-bottom:5px;">Enter credentials to unlock classified documents.
+            </p>
             <input type="text" id="username" placeholder="Username">
             <input type="password" id="password" placeholder="Password">
             <div class="modal-btns">
@@ -689,7 +781,21 @@
 
     <nav>
         <a href="#" class="nav-logo">NEXORA</a>
-        <div class="nav-right">
+        <div class="nav-right" style="display: flex; gap: 15px; align-items: center;">
+            <button class="new-chat-btn" onclick="createNewSession()" title="New Chat">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+            </button>
+            <div class="model-selector-compact">
+                <select id="model-select">
+                    <option value="llama3.2:latest">llama3.2</option>
+                    <option value="llama3:latest">llama3</option>
+                    <option value="mistral:latest">mistral</option>
+                    <option value="deepseek-r1:7b">deepseek-r1</option>
+                </select>
+            </div>
             <div class="role-selector-compact">
                 <select id="role">
                     <option value="Public">Public</option>
@@ -699,12 +805,7 @@
         </div>
     </nav>
 
-    <button class="new-chat-btn" onclick="createNewSession()">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="12" y1="5" x2="12" y2="19"></line>
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-        </svg>
-    </button>
+
 
     <div class="chat-history" id="chat-history"></div>
 
@@ -730,78 +831,160 @@
         uniform vec2 u_mouse;
         uniform vec2 u_resolution;
 
-        float random(vec2 st) { return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123); }
-        float noise(vec2 st) {
-            vec2 i = floor(st); vec2 f = fract(st);
-            float a = random(i); float b = random(i + vec2(1.0, 0.0));
-            float c = random(i + vec2(0.0, 1.0)); float d = random(i + vec2(1.0, 1.0));
-            vec2 u = f * f * (3.0 - 2.0 * f);
-            return mix(a, b, u.x) + (c - a)* u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+        // Realistic hash
+        float hash(vec2 p) {
+            vec3 p3  = fract(vec3(p.xyx) * .1031);
+            p3 += dot(p3, p3.yzx + 33.33);
+            return fract((p3.x + p3.y) * p3.z);
         }
 
-        float fbm(vec2 st) {
-            float value = 0.0; float amplitude = 0.5;
-            for (int i = 0; i < 5; i++) {
-                value += amplitude * noise(st);
-                st *= 2.0; amplitude *= 0.5;
+        // 2D Noise for Clouds/Debris
+        float noise(vec2 x) {
+            vec2 i = floor(x);
+            vec2 f = fract(x);
+            vec2 u = f * f * (3.0 - 2.0 * f);
+            return mix(mix(hash(i + vec2(0.0, 0.0)), hash(i + vec2(1.0, 0.0)), u.x),
+                       mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);
+        }
+
+        float fbm(vec2 x) {
+            float v = 0.0;
+            float a = 0.5;
+            for (int i = 0; i < 5; ++i) {
+                v += a * noise(x);
+                x = x * 2.0 + vec2(100.0);
+                a *= 0.5;
             }
-            return value;
+            return v;
         }
 
         void main() {
             vec2 uv = gl_FragCoord.xy / u_resolution.xy;
             vec2 p = uv * 2.0 - 1.0;
             p.x *= u_resolution.x / u_resolution.y;
+            vec2 m = (u_mouse * 2.0 - 1.0) * 0.1; // Parallax
 
-            vec2 mouse = u_mouse * 2.0 - 1.0;
-            mouse.x *= u_resolution.x / u_resolution.y;
+            // 1. STARRY SPACE (Background layer)
+            vec3 color = vec3(0.0, 0.0, 0.005); // Deep space base
+            vec2 starP = p + m * 0.2;
+            vec2 g = floor(starP * 40.0);
+            vec2 f = fract(starP * 40.0) - 0.5;
+            float h = hash(g);
+            if(h > 0.85) {
+                float twinkle = sin(u_time * 2.0 + h * 10.0) * 0.5 + 0.5;
+                float d = length(f - (vec2(hash(g*1.1), hash(g*1.2)) - 0.5) * 0.8);
+                color += vec3(0.8, 0.9, 1.0) * smoothstep(0.03 * h, 0.0, d) * twinkle;
+            }
 
-            float mouseDist = length(p - mouse);
-            
-            vec2 flow = p;
-            flow += (p - mouse) * 0.4 * exp(-mouseDist * 2.5); 
+            // 2. EARTH HORIZON (Bottom layer)
+            float earthCurve = -0.9 - 0.2 * pow(abs(p.x * 0.4), 2.0);
+            float distToEarth = p.y - (earthCurve + m.y * 0.5);
 
-            vec2 q = vec2(0.0);
-            q.x = fbm(flow + 0.1 * u_time);
-            q.y = fbm(flow + vec2(1.0));
+            // Atmospheric Scattering (Strictly bounded haze)
+            float haze = smoothstep(0.3, 0.1, distToEarth) * smoothstep(-0.2, 0.0, distToEarth);
+            vec3 atmosphereColor = vec3(0.05, 0.3, 0.8) * haze * 1.5;
 
-            vec2 r = vec2(0.0);
-            // More organic and slower horizontal pull
-            r.x = fbm(flow + 1.0 * q + vec2(1.7, 9.2) + 0.1 * u_time); 
-            r.y = fbm(flow + 1.0 * q + vec2(8.3, 2.8) + 0.08 * u_time);
+            // Earth Surface (Dark blue with cloud highlights)
+            if(distToEarth < 0.0) {
+                float clouds = fbm(p * 2.0 + vec2(u_time * 0.015, 0.0) + m * 0.8);
+                vec3 earthBase = mix(vec3(0.01, 0.02, 0.08), vec3(0.05, 0.1, 0.2), clouds);
+                color = mix(earthBase, atmosphereColor, smoothstep(-0.15, 0.0, distToEarth));
+            } else {
+                color = mix(color, atmosphereColor, haze);
+            }
 
-            float f = fbm(flow + r * 2.0); 
+            // 3. FIERY DEBRIS ENTRY (Mid layer)
+            float entryTime = u_time * 0.8;
+            for(float i=0.0; i<2.0; i++) {
+                float id = i + 123.45;
+                float cycle = mod(entryTime + hash(vec2(id)) * 10.0, 8.0);
+                vec2 start = vec2(1.5 + hash(vec2(id, 1.0)), 1.5);
+                vec2 dir = normalize(vec2(-1.2, -1.0));
+                vec2 head = start + dir * cycle * 2.5;
 
-            // Base Light Setup (Emanating from middle-right like xAI image)
-            vec2 lightPos = vec2(1.0, 0.0); 
-            // Stretch the light horizontally
-            float lightDist = length(vec2(p.x - lightPos.x, (p.y - lightPos.y) * 1.5));
-            
-            float core = exp(-lightDist * 1.5);
-            float aura = smoothstep(0.0, 1.0, f) * core * 0.7;
+                vec2 pa = p - head;
+                float tailL = 1.0;
+                float h_tail = clamp(dot(pa, -dir)/tailL, 0.0, 1.0);
+                vec2 proj = -dir * h_tail * tailL;
+                float d_tail = length(pa - proj);
 
-            vec3 colorBase = vec3(0.00, 0.00, 0.01); // Deeper void
-            vec3 colorEdge = vec3(0.02, 0.15, 0.45); // Deeper Blue, less bright
-            vec3 colorCore = vec3(0.5, 0.65, 0.85);  // Less Blinding white
+                float thickness = mix(0.01, 0.0, h_tail) * (0.8 + 0.4 * fbm(p * 8.0 - dir * u_time * 10.0));
+                float fire = smoothstep(thickness * 1.5, 0.0, d_tail) * exp(-h_tail * 2.0);
 
-            vec3 finalColor = mix(colorBase, colorEdge, clamp((f * f) * 3.0, 0.0, 1.0));
-            finalColor = mix(finalColor, colorCore, clamp(pow(aura, 0.9) * 2.5, 0.0, 1.0));
+                if(cycle < 6.0) {
+                    vec3 fireCol = mix(vec3(1.0, 0.6, 0.1), vec3(0.8, 0.05, 0.02), h_tail);
+                    color = mix(color, fireCol, fire * 1.2 * smoothstep(6.0, 5.0, cycle));
+                }
+            }
 
-            float rightBloom = smoothstep(-0.2, 2.0, p.x + 1.0) * f;
-            finalColor += vec3(0.4, 0.5, 0.7) * pow(rightBloom, 2.0) * 0.5;
+            // 4. SATELLITES (Detailed Geostationary Satellites)
+            for(float i=0.0; i<4.0; i++) {
+                float id = i + 55.5;
+                float satSpeed = 0.01 + hash(vec2(id)) * 0.015;
+                vec2 satP = vec2(mod(u_time * satSpeed + hash(vec2(id)) * 4.0, 4.0) - 2.0, 0.2 + hash(vec2(id, 2.0)) * 0.4);
+                vec2 dp = p - satP;
+                float body = smoothstep(0.008, 0.006, max(abs(dp.x), abs(dp.y)));
+                float wings = smoothstep(0.003, 0.001, abs(dp.y)) * smoothstep(0.025, 0.023, abs(dp.x));
+                vec3 satCol = mix(vec3(0.0), vec3(0.6, 0.8, 1.0), body);
+                satCol = mix(satCol, vec3(0.2, 0.3, 0.5), wings);
+                float pulse = sin(u_time * 4.0 + id * 10.0) * 0.5 + 0.5;
+                float beacon = smoothstep(0.004, 0.0, length(dp - vec2(0.0, 0.005))) * pulse;
+                float finalSatMask = clamp(body + wings, 0.0, 1.0);
+                if(finalSatMask > 0.0) {
+                    color = mix(color, satCol, finalSatMask);
+                    color += vec3(1.0, 0.2, 0.2) * beacon;
+                }
+            }
 
-            float hoverGlow = exp(-mouseDist * 3.0) * 0.2;
-            // Less extreme hover glow, more subtle liquid reaction
-            finalColor += colorEdge * hoverGlow * f * 0.4;
+            // 5. ROCKET SHUTTLE (Launch from Earth - Bounded SDF)
+            float launchTime = u_time * 0.3;
+            float launchCycle = mod(launchTime + 2.0, 12.0);
 
-            gl_FragColor = vec4(finalColor, 1.0);
+            vec2 rStart = vec2(-1.0, -0.6);
+            vec2 rDir = normalize(vec2(0.7, 1.0));
+            vec2 rHead = rStart + rDir * launchCycle * 0.3;
+
+            vec2 ra = p - rHead;
+            float rL = 0.08; // Fixed rocket length for SDF
+            float h_r = clamp(dot(ra, -rDir)/rL, 0.0, 1.0);
+            vec2 proj_r = -rDir * h_r * rL;
+            float d_r = length(ra - proj_r);
+
+            // Rocket Body shape
+            float rBody = smoothstep(0.01, 0.008, d_r);
+
+            // Flame shape (Bounded Candle)
+            vec2 fHead = rHead - rDir * 0.05;
+            vec2 fa = p - fHead;
+            float fL = 0.04 + 0.02 * sin(u_time * 40.0);
+            float h_f = clamp(dot(fa, -rDir)/fL, 0.0, 1.0);
+            float d_f = length(fa + rDir * h_f * fL);
+            float fMask = smoothstep(0.015 * (1.0 - h_f), 0.0, d_f) * smoothstep(-0.01, 0.05, h_f);
+
+            if(launchCycle < 10.0) {
+                float fade = smoothstep(10.0, 9.0, launchCycle);
+                // Body
+                color = mix(color, vec3(0.9, 0.9, 1.0), rBody * fade);
+                // Flame
+                vec3 fireCol = mix(vec3(1.0, 0.5, 0.1), vec3(1.0, 0.1, 0.0), h_f);
+                color = mix(color, fireCol, fMask * fade * 1.5);
+            }
+
+            // Cinematic Vignette & contrast
+            float vignette = 1.0 - length(uv - 0.5) * 0.5;
+            color *= vignette;
+
+            gl_FragColor = vec4(clamp(color, 0.0, 1.0), 1.0);
         }
     </script>
 
     <script>
-        let scene, camera, renderer, material;
+        let scene, camera, renderer, material, earthGroup, earthMesh, atmosphereMesh, knowledgeGroup;
         let mouse = new THREE.Vector2(0.5, 0.5);
         let targetMouse = new THREE.Vector2(0.5, 0.5);
+
+        // Constants for 3D Knowledge Map
+        let activeFacts = [];
 
         function initShader() {
             scene = new THREE.Scene();
@@ -812,9 +995,14 @@
                     u_time: { value: 0.0 }, u_mouse: { value: new THREE.Vector2() }, u_resolution: { value: new THREE.Vector2() }
                 },
                 fragmentShader: document.getElementById('fragmentShader').textContent,
-                transparent: true, blending: THREE.AdditiveBlending
+                transparent: true
             });
             const mesh = new THREE.Mesh(geometry, material); scene.add(mesh);
+
+            // Knowledge Graph Visualization Group
+            knowledgeGroup = new THREE.Group();
+            scene.add(knowledgeGroup);
+
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             document.getElementById('webgl-container').appendChild(renderer.domElement);
@@ -824,6 +1012,36 @@
             document.addEventListener('mousemove', (e) => {
                 targetMouse.x = e.clientX / window.innerWidth;
                 targetMouse.y = 1.0 - (e.clientY / window.innerHeight);
+            });
+        }
+
+        // Visualize Logic (Journal Paper Feature)
+        function visualizeFacts(facts) {
+            // Clear old nodes
+            while(knowledgeGroup.children.length > 0) {
+                knowledgeGroup.remove(knowledgeGroup.children[0]);
+            }
+
+            facts.forEach((fact, i) => {
+                const angle = (i / facts.length) * Math.PI * 2;
+                const radius = 0.5 + Math.random() * 0.3;
+                const x = Math.cos(angle) * radius;
+                const y = Math.sin(angle) * radius;
+
+                // Create Node (Glow Star)
+                const nodeGeom = new THREE.SphereGeometry(0.015, 8, 8);
+                const nodeMat = new THREE.MeshBasicMaterial({ color: 0x4da6ff });
+                const node = new THREE.Mesh(nodeGeom, nodeMat);
+                node.position.set(x, y, 0);
+
+                // Add a glow/halo to the node
+                const glowGeom = new THREE.CircleGeometry(0.04, 16);
+                const glowMat = new THREE.MeshBasicMaterial({ color: 0x4da6ff, transparent: true, opacity: 0.3 });
+                const glow = new THREE.Mesh(glowGeom, glowMat);
+                glow.position.set(x, y, -0.01);
+
+                knowledgeGroup.add(node);
+                knowledgeGroup.add(glow);
             });
         }
 
@@ -859,13 +1077,47 @@
                 sessions.forEach(s => {
                     const div = document.createElement('div');
                     div.className = 'session-item' + (s.id === currentSessionId ? ' active' : '');
-                    div.textContent = s.title || 'New Chat';
+
+                    const title = document.createElement('span');
+                    title.textContent = s.title || 'New Chat';
+                    title.style.overflow = 'hidden';
+                    title.style.textOverflow = 'ellipsis';
+                    title.style.whiteSpace = 'nowrap';
+                    title.style.flex = '1';
+
+                    const delBtn = document.createElement('button');
+                    delBtn.className = 'delete-session-btn';
+                    delBtn.innerHTML = `
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
+                        </svg>
+                    `;
+                    delBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        deleteSession(s.id);
+                    };
+
                     div.onclick = () => selectSession(s.id);
+                    div.appendChild(title);
+                    div.appendChild(delBtn);
                     list.appendChild(div);
                 });
-            } catch(e) {}
+            } catch (e) { }
         }
-        
+
+        async function deleteSession(id) {
+            try {
+                const res = await fetch(`/sessions/${id}`, { method: 'DELETE' });
+                if (res.ok) {
+                    if (id === currentSessionId) {
+                        createNewSession();
+                    } else {
+                        loadSessions();
+                    }
+                }
+            } catch (e) { }
+        }
+
         async function createNewSession() {
             document.body.classList.remove('chat-active');
             historyBox.innerHTML = '';
@@ -874,16 +1126,16 @@
             loadSessions();
             if (window.innerWidth <= 768 && !document.getElementById('sidebar').classList.contains('closed')) toggleSidebar();
         }
-        
+
         async function selectSession(id) {
             try {
                 const res = await fetch(`/sessions/${id}`);
                 const session = await res.json();
                 currentSessionId = session.id;
-                
+
                 document.body.classList.add('chat-active');
                 historyBox.innerHTML = '';
-                
+
                 session.messages.forEach(msg => {
                     const block = document.createElement('div');
                     block.className = `msg-block ${msg.role}`;
@@ -900,9 +1152,9 @@
                 historyBox.scrollTop = historyBox.scrollHeight;
                 loadSessions(); // update active state in sidebar
                 if (window.innerWidth <= 768) toggleSidebar();
-            } catch(e) {}
+            } catch (e) { }
         }
-        
+
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             sidebar.classList.toggle('closed');
@@ -912,12 +1164,12 @@
                 document.body.classList.add('sidebar-open-shift');
             }
         }
-        
+
         // --- Authentication ---
         const roleSelect = document.getElementById('role');
         let lastValidRole = "Public";
         let isScientistAuthenticated = false;
-        
+
         roleSelect.addEventListener('change', (e) => {
             if (e.target.value === "Scientist") {
                 if (!isScientistAuthenticated) {
@@ -929,20 +1181,20 @@
                 lastValidRole = e.target.value;
             }
         });
-        
+
         function cancelLogin() {
             document.getElementById('login-modal').classList.remove('active');
             roleSelect.value = lastValidRole;
         }
-        
+
         async function submitLogin() {
             const u = document.getElementById('username').value;
             const p = document.getElementById('password').value;
             try {
                 const res = await fetch('/login', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({username: u, password: p})
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: u, password: p })
                 });
                 if (res.ok) {
                     isScientistAuthenticated = true;
@@ -953,11 +1205,29 @@
                 } else {
                     alert('Invalid credentials!');
                 }
-            } catch(e) { alert('Login error'); }
+            } catch (e) { alert('Login error'); }
+        }
+
+        async function loadModels() {
+            try {
+                const res = await fetch('/models');
+                const models = await res.json();
+                const select = document.getElementById('model-select');
+                const currentVal = select.value;
+                select.innerHTML = '';
+                models.forEach(m => {
+                    const opt = document.createElement('option');
+                    opt.value = m;
+                    opt.textContent = m;
+                    select.appendChild(opt);
+                });
+                if (models.includes(currentVal)) select.value = currentVal;
+            } catch (e) { }
         }
 
         // Initialize on load
         loadSessions();
+        loadModels();
 
         function appendMessage(role, text) {
             const block = document.createElement('div');
@@ -986,7 +1256,7 @@
                     const s_res = await fetch('/sessions/new', { method: 'POST' });
                     const s_data = await s_res.json();
                     currentSessionId = s_data.session_id;
-                } catch(e) {}
+                } catch (e) { }
             }
 
             // Trigger Transition
@@ -1002,10 +1272,11 @@
                     const response = await fetch('/query', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ 
-                            query: query, 
+                        body: JSON.stringify({
+                            query: query,
                             role: document.getElementById('role').value,
-                            session_id: currentSessionId 
+                            session_id: currentSessionId,
+                            model_name: document.getElementById('model-select').value
                         })
                     });
 
@@ -1013,19 +1284,74 @@
                     const decoder = new TextDecoder();
                     let isFirstChunk = true;
                     let fullText = "";
+                    let metadataProcessed = false;
+                    let buffer = ""; // Buffer to handle metadata split across TCP packets
 
                     while (true) {
                         const { done, value } = await reader.read();
                         if (done) break;
 
-                        if (isFirstChunk) {
-                            sysBubble.innerHTML = ''; // Clear thinking wave only when first text chunk arrives
-                            isFirstChunk = false;
+                        let raw = decoder.decode(value, { stream: true });
+                        buffer += raw;
+
+                        // Process metadata ONCE — it's always the very first line
+                        if (!metadataProcessed) {
+                            const newlineIndex = buffer.indexOf("\n");
+                            if (newlineIndex !== -1) {
+                                const firstLine = buffer.substring(0, newlineIndex);
+                                const rest = buffer.substring(newlineIndex + 1);
+
+                                if (firstLine.startsWith("__METADATA__:")) {
+                                    try {
+                                        const jsonStr = firstLine.replace("__METADATA__:", "");
+                                        const metadata = JSON.parse(jsonStr);
+                                        if (metadata.facts) visualizeFacts(metadata.facts);
+
+                                        if (metadata.sources && metadata.sources.length > 0) {
+                                            const sourceEl = document.createElement('div');
+                                            sourceEl.className = 'source-badge';
+                                            const names = metadata.sources.map(s => s.split('/').pop()).join(', ');
+                                            sourceEl.innerHTML = `<i class="fa fa-shield-alt"></i> Verified by: ${names}`;
+                                            sysBubble.parentNode.insertBefore(sourceEl, sysBubble);
+                                        }
+                                    } catch(e) { console.error("Metadata parse error", e); }
+                                    metadataProcessed = true;
+                                    buffer = rest; // Only keep text after metadata
+                                } else {
+                                    // No metadata line found — process buffer as plain text
+                                    metadataProcessed = true;
+                                }
+                            } else {
+                                // Still buffering — waiting for the full first line
+                                continue;
+                            }
                         }
 
-                        fullText += decoder.decode(value, { stream: true });
+                        // At this point, buffer contains only clean AI text
+                        let chunk = buffer;
+                        buffer = ""; // Flush buffer
+
+                        // Safety: strip any accidental metadata leakage (handles both __METADATA__ and METADATA)
+                        chunk = chunk.split("\n")
+                            .filter(l => !l.includes("METADATA:"))
+                            .join("\n");
+
+                        if (chunk.trim() !== "") {
+                            if (isFirstChunk) {
+                                sysBubble.innerHTML = '';
+                                isFirstChunk = false;
+                            }
+                            fullText += chunk;
+                            sysBubble.innerHTML = marked.parse(fullText);
+                            historyBox.scrollTop = historyBox.scrollHeight;
+                        }
+                    }
+
+                    // Flush any remaining buffer content
+                    if (buffer.trim() !== "") {
+                        if (isFirstChunk) { sysBubble.innerHTML = ''; isFirstChunk = false; }
+                        fullText += buffer;
                         sysBubble.innerHTML = marked.parse(fullText);
-                        historyBox.scrollTop = historyBox.scrollHeight;
                     }
 
                     if (isFirstChunk) sysBubble.innerHTML = ''; // Fallback if empty response
